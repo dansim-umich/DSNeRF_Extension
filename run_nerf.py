@@ -216,7 +216,8 @@ def render_test_ray(rays_o, rays_d, hwf, ndc, near, far, use_viewdirs, N_samples
     near, far = near * torch.ones_like(rays_d[...,:1]), far * torch.ones_like(rays_d[...,:1])
 
     t_vals = torch.linspace(0., 1., steps=N_samples).to(device)
-    z_vals = near * (1.-t_vals) + far * (t_vals)
+    d_vals = near * (1.-t_vals) + far * (t_vals)
+    z_vals = near + torch.log(d_vals - near + 1) / torch.log(far - near + 1) * (far - near)
 
     z_vals = z_vals.reshape([rays_o.shape[0], N_samples])
 
@@ -390,12 +391,18 @@ def render_rays(ray_batch,
     near, far = bounds[...,0], bounds[...,1] # [-1,1]
 
     t_vals = torch.linspace(0., 1., steps=N_samples).to(device)
+    # dansim
     if not lindisp:
-        z_vals = near * (1.-t_vals) + far * (t_vals)
+        d_vals = near * (1.-t_vals) + far * (t_vals)
+        z_vals = near + torch.log(d_vals - near + 1) / torch.log(far - near + 1) * (far - near)
     else:
-        z_vals = 1./(1./near * (1.-t_vals) + 1./far * (t_vals))
+        d_vals = 1./(1./near * (1.-t_vals) + 1./far * (t_vals))
+        z_vals = near + torch.log(d_vals - near + 1) / torch.log(far - near + 1) * (far - near)
 
     z_vals = z_vals.expand([N_rays, N_samples])
+
+    rays_d = rays_d * 1. / torch.sqrt(torch.abs(rays_d) * far)
+    # dansim
 
     if perturb > 0.:
         # get intervals between samples
