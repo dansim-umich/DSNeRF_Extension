@@ -59,7 +59,7 @@ class SigmaLoss:
         t_vals = t_vals.expand([N_rays, self.N_samples])
         d_vals = near * (1.-t_vals) + far * (t_vals)
         z_vals = near + torch.log(d_vals - near + 1) / torch.log(far - near + 1) * (far - near)
-        rays_d = rays_d * 1. / torch.sqrt(torch.abs(rays_d) * far)
+        #rays_d = rays_d * 1. / torch.sqrt(torch.abs(rays_d) * far)
         if self.perturb > 0.:
             # get intervals between samples
             mids = .5 * (z_vals[...,1:] + z_vals[...,:-1])

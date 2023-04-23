@@ -1,53 +1,28 @@
 # Depth-supervised NeRF: Fewer Views and Faster Training for Free
+## Reproduction and Algorithmic Extension
 
-[**Project**](https://www.cs.cmu.edu/~dsnerf/) | [**Paper**](https://arxiv.org/abs/2107.02791) | [**YouTube**](https://youtu.be/84LFxCo7ogk)
+[ Wai-Ting Li](waitingl@umich.edu)
+[Daniel Simmons](dansim@umich.edu)
 
-Pytorch implementation of DS-NeRF. DS-NeRF can improve the training of neural radiance fields by leveraging depth supervision derived from 3D point clouds. It can be used to train NeRF models given only very few input views.
-
-<p align="center">
-  <img src="resources/DSNeRF_teaser_small.gif"  width="800" />
-</p>
-
-
-[Depth-supervised NeRF: Fewer Views and Faster Training for Free](https://www.cs.cmu.edu/~dsnerf/)
-
-CVPR, 2022
-
- [Kangle Deng](https://dunbar12138.github.io/)<sup>1</sup>,
- [Andrew Liu](https://andrewhliu.github.io/)<sup>2</sup>,
- [Jun-Yan Zhu](https://www.cs.cmu.edu/~junyanz/)<sup>1</sup>,
- [Deva Ramanan](https://www.cs.cmu.edu/~deva/)<sup>1,3</sup>,
-
-<sup>1</sup>CMU, <sup>2</sup>Google, <sup>3</sup>Argo AI
+University of Michigan DeepRob Final Project
+Submitted 4/24/2023
 
 ---
 
 We propose DS-NeRF (Depth-supervised Neural Radiance Fields), a model for learning neural radiance fields that takes advantage of depth supervised by 3D point clouds. Current NeRF methods require many images with known camera parameters -- typically produced by running structure-from-motion (SFM) to estimate poses and a sparse 3D point cloud. Most, if not all, NeRF pipelines make use of the former but ignore the latter. Our key insight is that such sparse 3D input can be used as an additional free signal during training.
 
-<p align="center">
-  <img src="figure_teaser.png"  width="800" />
-</p>
+We have recreated the results from the DS-NeRF paper and extendended its scope by implementing non-linear ray sampling. Instead of linear, samples with be sampled in greater proximity around the foreground of the image. This wastes less computation on less significant portions of the training images.
 
 ## Results
 
-NeRF trained with 2 views:
+DS-NeRF training upon the LLFF dataset:
 <p align="center">
-  <img src="resources/DSNeRF_nerf.gif"  width="800" />
+  <img src="resources/room_PSNR_all.png"  width="800" />
 </p>
 
-DS-NeRF trained with 2 views:
+Non-linear ray sampling slightly improves results:
 <p align="center">
-  <img src="resources/DSNeRF_dsnerf.gif"  width="800" />
-</p>
-
-NeRF trained with 5 views:
-<p align="center">
-  <img src="resources/all_nerf_5v.gif"  width="800" />
-</p>
-
-DS-NeRF trained with 5 views:
-<p align="center">
-  <img src="resources/all_dsnerf_5v.gif"  width="800" />
+  <img src="resources/fern_2v_PSNR_compare.png"  width="800" />
 </p>
 
 ---
@@ -66,30 +41,7 @@ You will also need [COLMAP](https://github.com/colmap/colmap) installed to compu
 
 ### Data
 
-<!-- Download data for the example scene: `fern_2v`
-```
-bash download_example_data.sh
-``` -->
-
-Download the LLFF dataset [here](https://drive.google.com/file/d/1RjhfcbsywOvw0ts1AFSri91mKANvEVOa/view?usp=sharing).
-
-To play with other scenes presented in the paper, download the data [here](https://drive.google.com/drive/folders/1PsT3uKwqHHD2bEEHkIXB99AlIjtmrEiR?usp=sharing).
-
-
-### Pre-trained Models
-
-<!-- You can download the pre-trained models [here](https://drive.google.com/drive/folders/1lby-G4163NFi7Ue4rdB9D0cM67d7oskr?usp=sharing). Place the downloaded directory in `./logs` in order to test it later.  -->
-You can download our pre-trained models using the following script:
-```
-bash download_models.sh
-```
-
-See the following directory structure for an example:
-```
-├── logs 
-│   ├── fern_2v    # downloaded logs
-│   ├── flower_2v  # downloaded logs
-```
+This project was done using the [LLFF dataset](https://drive.google.com/file/d/1RjhfcbsywOvw0ts1AFSri91mKANvEVOa/view?usp=sharing).
 
 ### How to Run?
 
@@ -142,16 +94,11 @@ It will create an experiment directory in `./logs`, and store the checkpoints an
 
 You can create your own experiment configuration to try other datasets.
 
-
-### Use depth-supervised loss in your own project
-
-We provide a tutorial on how to use depth-supervised loss in your own project [here](resources/tutorial.md).
-
 ---
 
 ## Citation
 
-If you find this repository useful for your research, please cite the following work.
+This repository was based upon the [DS-NeRF](https://github.com/dunbar12138/DSNeRF) repository and modified with concepts from [DONeRF](https://github.com/facebookresearch/DONERF). Please see them for more information.
 ```
 @InProceedings{kangle2021dsnerf,
     author    = {Deng, Kangle and Liu, Andrew and Zhu, Jun-Yan and Ramanan, Deva},
@@ -160,10 +107,19 @@ If you find this repository useful for your research, please cite the following 
     month     = {June},
     year      = {2022}
 }
+
+@article{neff2021donerf,
+author = {Neff, T. and Stadlbauer, P. and Parger, M. and Kurz, A. and Mueller, J. H. and Chaitanya, C. R. A. and Kaplanyan, A. and Steinberger, M.},
+title = {DONeRF: Towards Real-Time Rendering of Compact Neural Radiance Fields using Depth Oracle Networks},
+journal = {Computer Graphics Forum},
+volume = {40},
+number = {4},
+pages = {45-59},
+keywords = {CCS Concepts, • Computing methodologies → Rendering},
+doi = {https://doi.org/10.1111/cgf.14340},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/cgf.14340},
+eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/cgf.14340},
+abstract = {Abstract The recent research explosion around implicit neural representations, such as NeRF, shows that there is immense potential for implicitly storing high-quality scene and lighting information in compact neural networks. However, one major limitation preventing the use of NeRF in real-time rendering applications is the prohibitive computational cost of excessive network evaluations along each view ray, requiring dozens of petaFLOPS. In this work, we bring compact neural representations closer to practical rendering of synthetic content in real-time applications, such as games and virtual reality. We show that the number of samples required for each view ray can be significantly reduced when samples are placed around surfaces in the scene without compromising image quality. To this end, we propose a depth oracle network that predicts ray sample locations for each view ray with a single network evaluation. We show that using a classification network around logarithmically discretized and spherically warped depth values is essential to encode surface locations rather than directly estimating depth. The combination of these techniques leads to DONeRF, our compact dual network design with a depth oracle network as its first step and a locally sampled shading network for ray accumulation. With DONeRF, we reduce the inference costs by up to 48× compared to NeRF when conditioning on available ground truth depth information. Compared to concurrent acceleration methods for raymarching-based neural representations, DONeRF does not require additional memory for explicit caching or acceleration structures, and can render interactively (20 frames per second) on a single GPU.},
+year = {2021}
+}
 ```
-
----
-
-## Acknowledgments
-
-This code borrows heavily from [nerf-pytorch](https://github.com/yenchenlin/nerf-pytorch). We thank Takuya Narihira, Akio Hayakawa, Sheng-Yu Wang, and for helpful discussion. We are grateful for the support from Sony Corporation, Singapore DSTA, and the CMU Argo AI Center for Autonomous Vehicle Research.
